@@ -69,12 +69,12 @@ const Layout = ({ children }) => {
                                 </li>
                                 <li>
                                     <a href="/profile" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                                        Profile
+                                        Perfil
                                     </a>
                                 </li>
                                 <li>
                                     <a href="/settings" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                                        Settings
+                                        Configuraciones
                                     </a>
                                 </li>
 
