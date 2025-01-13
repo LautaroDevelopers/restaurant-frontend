@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RiMore2Fill } from '@remixicon/react';
 
 function UsersPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [first_name, setFirstName] = useState('');
+    const [last_name, setLastName] = useState('');
+    const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
@@ -29,7 +32,7 @@ function UsersPage() {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://192.168.0.112:5000/api/users/register', { username, password, role });
+            await axios.post('http://192.168.0.112:5000/api/users/register', { username, password, first_name, last_name, email, role });
             fetchUsers();
             setShowModal(false);
         } catch (error) {
@@ -199,9 +202,36 @@ function UsersPage() {
                             <div className="mb-4">
                                 <input
                                     type="text"
+                                    value={first_name}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    placeholder="Nombre"
+                                    className="w-full p-2 border border-gray-700 rounded bg-gray-900 text-white"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <input
+                                    type="text"
+                                    value={last_name}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    placeholder="Apellido"
+                                    className="w-full p-2 border border-gray-700 rounded bg-gray-900 text-white"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Correo electronico"
+                                    className="w-full p-2 border border-gray-700 rounded bg-gray-900 text-white"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <input
+                                    type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="Username"
+                                    placeholder="Nombre de usuario"
                                     className="w-full p-2 border border-gray-700 rounded bg-gray-900 text-white"
                                 />
                             </div>
@@ -210,7 +240,7 @@ function UsersPage() {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Password"
+                                    placeholder="Contraseña"
                                     className="w-full p-2 border border-gray-700 rounded bg-gray-900 text-white"
                                 />
                             </div>
