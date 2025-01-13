@@ -5,18 +5,18 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const Layout = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [isSidebarVisible, setIsSidebarVisible] = useState(() => {
+    const [ isSidebarVisible, setIsSidebarVisible ] = useState(() => {
         const savedState = localStorage.getItem('isSidebarVisible');
         return savedState !== null ? JSON.parse(savedState) : true;
     });
 
     useEffect(() => {
         localStorage.setItem('isSidebarVisible', JSON.stringify(isSidebarVisible));
-    }, [isSidebarVisible]);
+    }, [ isSidebarVisible ]);
 
     useEffect(() => {
         setIsSidebarVisible(false);
-    }, [location]);
+    }, [ location ]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-900 overflow-hidden">
+        <div className="dashboard flex flex-col min-h-screen bg-gray-900 overflow-hidden">
             <header className="bg-gray-800 text-white py-4 shadow-md z-50 fixed top-0 left-0 right-0">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center">

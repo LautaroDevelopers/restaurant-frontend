@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const WaiterDashboard = () => {
-    const [orders, setOrders] = useState([]);
-    const [tableNumber, setTableNumber] = useState('');
-    const [menuDishes, setMenuDishes] = useState([]);
-    const [selectedDishes, setSelectedDishes] = useState([]);
-    const [newDish, setNewDish] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [ orders, setOrders ] = useState([]);
+    const [ tableNumber, setTableNumber ] = useState('');
+    const [ menuDishes, setMenuDishes ] = useState([]);
+    const [ selectedDishes, setSelectedDishes ] = useState([]);
+    const [ newDish, setNewDish ] = useState('');
+    const [ loading, setLoading ] = useState(false);
+    const [ error, setError ] = useState(null);
+    const [ success, setSuccess ] = useState(null);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -28,13 +30,15 @@ const WaiterDashboard = () => {
                 table_number: tableNumber,
                 dishes: selectedDishes,
             });
-            alert('Pedido creado exitosamente');
-            setOrders([...orders, response.data]);
+            setOrders([ ...orders, response.data ]);
             setTableNumber('');
             setSelectedDishes([]);
+            setSuccess('Pedido creado exitosamente');
+            setError(null);
         } catch (error) {
             console.error('Error al crear el pedido:', error);
-            alert('No se pudo crear el pedido');
+            setError('No se pudo crear el pedido');
+            setSuccess(null);
         } finally {
             setLoading(false);
         }
@@ -58,11 +62,16 @@ const WaiterDashboard = () => {
 
     const removeDish = (dishToRemove) => {
         setSelectedDishes(selectedDishes.filter(dish => dish !== dishToRemove));
+        setSuccess('Plato eliminado exitosamente');
+        setError(null);
     };
 
     return (
         <div className="container mx-auto p-4 max-w-full text-white">
             <h1 className="text-3xl font-bold mb-6">Crear Nuevo Pedido</h1>
+
+            {error && <div className="text-red-500 mb-4">{error}</div>}
+            {success && <div className="text-green-500 mb-4">{success}</div>}
 
             <div className="mb-6">
                 <div className="mb-4">
@@ -91,7 +100,7 @@ const WaiterDashboard = () => {
                                     key={index}
                                     onClick={() => {
                                         if (!selectedDishes.includes(dish)) {
-                                            setSelectedDishes([...selectedDishes, dish]);
+                                            setSelectedDishes([ ...selectedDishes, dish ]);
                                             setNewDish('');
                                         }
                                     }}

@@ -50,8 +50,8 @@ function Cards({ searchTerm, menu }) {
 }
 
 export default function MenuPage() {
-    const [menu, setMenu] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [ menu, setMenu ] = useState([]);
+    const [ searchTerm, setSearchTerm ] = useState("");
 
     useEffect(() => {
         axios.get('http://192.168.0.112:5000/api/menu')
