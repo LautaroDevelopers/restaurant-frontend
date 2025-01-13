@@ -7,8 +7,11 @@ import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import LandingPage from "./pages/LandingPage";
 import MenuPage from "./pages/MenuPage";
+import WaiterDashboard from "./pages/WaiterDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
+import Forbidden from "./components/Forbidden";
+import Orders from "./pages/Orders";
 
 function App() {
     return (
@@ -21,7 +24,9 @@ function App() {
                 <Route path="/profile" element={<ProtectedRoute><Layout><ProfilePage /></Layout></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Layout><SettingsPage /></Layout></ProtectedRoute>} />
                 <Route path="/carta" element={<MenuPage />} />
-                <Route path="/unauthorized" element={<div>No tienes permiso para acceder a esta página</div>} />
+                <Route path="/orders" element={<ProtectedRoute requiredRole="Cocina"><Layout><Orders /></Layout></ProtectedRoute>} />
+                <Route path="/pedir" element={<ProtectedRoute><Layout><WaiterDashboard /></Layout></ProtectedRoute>} />
+                <Route path="/unauthorized" element={<Forbidden messaje="No tienes permiso para acceder a esta página"/>} />
             </Routes>
         </Router>
     );

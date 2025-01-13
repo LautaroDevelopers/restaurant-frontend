@@ -1,10 +1,10 @@
-// src/components/Layout.jsx
 import React, { useState, useEffect } from 'react';
 import { RiMenu2Fill, RiMenu3Fill } from '@remixicon/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Layout = ({ children }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isSidebarVisible, setIsSidebarVisible] = useState(() => {
         const savedState = localStorage.getItem('isSidebarVisible');
         return savedState !== null ? JSON.parse(savedState) : true;
@@ -13,6 +13,10 @@ const Layout = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('isSidebarVisible', JSON.stringify(isSidebarVisible));
     }, [isSidebarVisible]);
+
+    useEffect(() => {
+        setIsSidebarVisible(false);
+    }, [location]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -24,8 +28,8 @@ const Layout = ({ children }) => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen">
-            <header className="bg-blue-600 text-white py-4 shadow-md z-50 fixed top-0 left-0 right-0">
+        <div className="flex flex-col min-h-screen bg-gray-900 overflow-hidden">
+            <header className="bg-gray-800 text-white py-4 shadow-md z-50 fixed top-0 left-0 right-0">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center">
                         <button
@@ -38,9 +42,9 @@ const Layout = ({ children }) => {
                     </div>
                 </div>
             </header>
-            <main className="flex flex-1 mt-16">
+            <div className="flex flex-1 mt-16 relative overflow-hidden">
                 {isSidebarVisible && (
-                    <aside className="w-64 bg-gray-800 text-white p-4 z-40 fixed h-full">
+                    <aside className="w-64 bg-gray-800/70 text-white p-4 absolute top-0 left-0 bottom-0">
                         <nav>
                             <ul className="space-y-2">
                                 <li>
@@ -51,6 +55,16 @@ const Layout = ({ children }) => {
                                 <li>
                                     <a href="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
                                         Usuarios
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/pedir" className='block px-4 py-2 hover:bg-gray-700 rounded'>
+                                        Pedir
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/orders" className='block px-4 py-2 hover:bg-gray-700 rounded'>
+                                        Órdenes
                                     </a>
                                 </li>
                                 <li>
@@ -73,10 +87,10 @@ const Layout = ({ children }) => {
                         </nav>
                     </aside>
                 )}
-                <section className="flex-1 p-8">
+                <section className={`flex-1 p-8 bg-gray-900 text-white transition-all duration-300 ${isSidebarVisible ? 'ml-64' : 'ml-0'}`}>
                     {children}
                 </section>
-            </main>
+            </div>
         </div>
     );
 };
