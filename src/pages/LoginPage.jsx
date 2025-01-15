@@ -46,7 +46,7 @@ function LoginPage() {
                 <button type="submit" className="w-full bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300 mb-4">
                     Login
                 </button>
-                    <button type="submit" className="w-full bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center justify-center flex-row transition duration-300">
+                    <button type="submit" className="w-full bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded flex items-center justify-center flex-row transition duration-300" onClick={() => navigate('/')} >
                     <RiArrowLeftLine className='mr-2' size={24} /> Regresar
                 </button>
             </form>
