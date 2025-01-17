@@ -36,11 +36,11 @@ function Cards({ searchTerm, menu }) {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {filteredMenu.map((dish) => (
                     <div key={dish.name} className="bg-white p-4 rounded-lg shadow-lg">
-                        <img src={dish.image_url} className="w-full h-auto rounded-lg" alt={dish.name} />
+                        <img src={`http://192.168.0.112:5000${dish.image_url}`} className="w-full h-auto rounded-lg" alt={dish.name} />
                         <h4 className="text-xl font-bold text-gray-800 my-2">{dish.name}</h4>
                         <p className="text-xl font-bold text-gray-800 my-2">{dish.description}</p>
                         <div className="flex justify-between items-center mt-4">
-                            <span className="text-xl font-bold text-gray-800">${dish.price} USD</span>
+                            <span className="text-xl font-bold text-gray-800">${dish.price} ARS</span>
                         </div>
                     </div>
                 ))}

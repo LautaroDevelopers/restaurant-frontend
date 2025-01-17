@@ -68,6 +68,11 @@ const Layout = ({ children }) => {
                                     </a>
                                 </li>
                                 <li>
+                                    <a href="/dishes" className='block px-4 py-2 hover:bg-gray-700 rounded'>
+                                        Platos
+                                    </a>
+                                </li>
+                                <li>
                                     <a href="/profile" className="block px-4 py-2 hover:bg-gray-700 rounded">
                                         Perfil
                                     </a>

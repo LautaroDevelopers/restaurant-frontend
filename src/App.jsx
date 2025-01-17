@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Forbidden from "./components/Forbidden";
 import Orders from "./pages/Orders";
+import ManageDishesPage from "./pages/ManageDishesPage";
 
 function App() {
     return (
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/carta" element={<MenuPage />} />
                 <Route path="/orders" element={<ProtectedRoute requiredRole="Cocina"><Layout><Orders /></Layout></ProtectedRoute>} />
                 <Route path="/pedir" element={<ProtectedRoute><Layout><WaiterDashboard /></Layout></ProtectedRoute>} />
+                <Route path="/dishes" element={<ProtectedRoute requiredRole="Administrador"><Layout><ManageDishesPage /></Layout></ProtectedRoute>} />
                 <Route path="/unauthorized" element={<Forbidden messaje="No tienes permiso para acceder a esta página"/>} />
             </Routes>
         </Router>

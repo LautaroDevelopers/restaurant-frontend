@@ -195,8 +195,8 @@ function UsersPage() {
             </div>
 
             {showModal && (
-                <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex justify-center items-center">
-                    <div className="bg-gray-800 p-6 rounded shadow-md w-full max-w-sm mx-4">
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4">
                         <h2 className="text-2xl font-bold mb-4">Registrar Usuario</h2>
                         <form onSubmit={handleRegister}>
                             <div className="mb-4">
