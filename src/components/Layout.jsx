@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RiMenu2Fill, RiMenu3Fill } from '@remixicon/react';
+import { RiMenu2Fill, RiMenu3Fill, RiLogoutBoxLine } from '@remixicon/react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const Layout = ({ children }) => {
@@ -9,6 +9,7 @@ const Layout = ({ children }) => {
         const savedState = localStorage.getItem('isSidebarVisible');
         return savedState !== null ? JSON.parse(savedState) : true;
     });
+    const userRole = localStorage.getItem('role');
 
     useEffect(() => {
         localStorage.setItem('isSidebarVisible', JSON.stringify(isSidebarVisible));
@@ -20,6 +21,7 @@ const Layout = ({ children }) => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('role');
         navigate('/login');
     };
 
@@ -34,7 +36,7 @@ const Layout = ({ children }) => {
                     <div className="flex items-center">
                         <button
                             onClick={toggleSidebar}
-                            className="px-4 py-2 text-white rounded-full hover:font-bold mr-4 flex items-center"
+                            className="px-4 py-2 text-white hover:font-bold mr-4 flex items-center"
                         >
                             {isSidebarVisible ? <RiMenu3Fill /> : <RiMenu2Fill />}
                         </button>
@@ -52,26 +54,34 @@ const Layout = ({ children }) => {
                                         Inicio
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
-                                        Usuarios
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/pedir" className='block px-4 py-2 hover:bg-gray-700 rounded'>
-                                        Pedir
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/orders" className='block px-4 py-2 hover:bg-gray-700 rounded'>
-                                        Órdenes
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/dishes" className='block px-4 py-2 hover:bg-gray-700 rounded'>
-                                        Platos
-                                    </a>
-                                </li>
+                                {userRole === 'Administrador' && (
+                                    <>
+                                        <li>
+                                            <a href="/users" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                                                Usuarios
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="/dishes" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                                                Platos
+                                            </a>
+                                        </li>
+                                    </>
+                                )}
+                                {(userRole === 'Administrador' || userRole === 'Mozo') && (
+                                    <li>
+                                        <a href="/pedir" className='block px-4 py-2 hover:bg-gray-700 rounded'>
+                                            Pedir
+                                        </a>
+                                    </li>
+                                )}
+                                {(userRole === 'Administrador' || userRole === 'Cocina') && (
+                                    <li>
+                                        <a href="/orders" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                                            Órdenes
+                                        </a>
+                                    </li>
+                                )}
                                 <li>
                                     <a href="/profile" className="block px-4 py-2 hover:bg-gray-700 rounded">
                                         Perfil
@@ -84,8 +94,8 @@ const Layout = ({ children }) => {
                                 </li>
 
                                 <li>
-                                    <button onClick={handleLogout} className="w-full px-4 py-2 text-start hover:bg-gray-700 rounded">
-                                        Cerrar Sesión
+                                    <button onClick={handleLogout} className="w-full px-4 py-2 text-start bg-red-600 hover:bg-red-700 rounded flex items-center">
+                                        <RiLogoutBoxLine /> Cerrar Sesión
                                     </button>
                                 </li>
                             </ul>

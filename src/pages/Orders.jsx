@@ -132,7 +132,7 @@ export default function Orders() {
             ))}
 
             {selectedOrder && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+                <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4">
                         <h3 className="text-lg font-semibold mb-2">Mesa: {selectedOrder.table_number}</h3>
                         <p className="mb-2"><strong>Platos:</strong> {Array.isArray(selectedOrder.dishes) ? selectedOrder.dishes.join(', ') : JSON.parse(selectedOrder.dishes).join(', ')}</p>

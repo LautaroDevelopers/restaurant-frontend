@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const WaiterDashboard = () => {
@@ -10,6 +10,7 @@ const WaiterDashboard = () => {
     const [ loading, setLoading ] = useState(false);
     const [ error, setError ] = useState(null);
     const [ success, setSuccess ] = useState(null);
+    const [ total, setTotal ] = useState(0);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -28,11 +29,13 @@ const WaiterDashboard = () => {
         try {
             const response = await axios.post('http://192.168.0.112:5000/api/orders', {
                 table_number: tableNumber,
-                dishes: selectedDishes,
+                dishes: selectedDishes.flatMap(dish => Array(dish.quantity).fill(dish.name)),
+                total: total.toFixed(2)
             });
             setOrders([ ...orders, response.data ]);
             setTableNumber('');
             setSelectedDishes([]);
+            setTotal(0);
             setSuccess('Pedido creado exitosamente');
             setError(null);
         } catch (error) {
@@ -48,7 +51,7 @@ const WaiterDashboard = () => {
         const fetchMenu = async () => {
             try {
                 const response = await axios.get('http://192.168.0.112:5000/api/menu');
-                setMenuDishes(response.data.map(dish => dish.name));
+                setMenuDishes(response.data);
             } catch (error) {
                 console.error('Error al obtener la carta:', error);
             }
@@ -57,13 +60,37 @@ const WaiterDashboard = () => {
     }, []);
 
     const filteredDishes = menuDishes.filter(dish =>
-        dish.toLowerCase().includes(newDish.toLowerCase())
+        dish.name.toLowerCase().includes(newDish.toLowerCase())
     );
 
-    const removeDish = (dishToRemove) => {
-        setSelectedDishes(selectedDishes.filter(dish => dish !== dishToRemove));
+    const removeDish = (index) => {
+        const dishToRemove = selectedDishes[index];
+        if (dishToRemove.quantity > 1) {
+            setSelectedDishes(
+                selectedDishes.map((d, i) =>
+                    i === index ? { ...d, quantity: d.quantity - 1 } : d
+                )
+            );
+        } else {
+            setSelectedDishes(selectedDishes.filter((_, i) => i !== index));
+        }
+        setTotal(total - parseFloat(dishToRemove.price));
         setSuccess('Plato eliminado exitosamente');
         setError(null);
+    };
+
+    const handleDishSelect = (dish) => {
+        const existingDish = selectedDishes.find((d) => d.id === dish.id);
+        if (existingDish) {
+            setSelectedDishes(
+                selectedDishes.map((d) =>
+                    d.id === dish.id ? { ...d, quantity: d.quantity + 1 } : d
+                )
+            );
+        } else {
+            setSelectedDishes([...selectedDishes, { ...dish, quantity: 1 }]);
+        }
+        setTotal(total + parseFloat(dish.price));
     };
 
     return (
@@ -100,13 +127,13 @@ const WaiterDashboard = () => {
                                     key={index}
                                     onClick={() => {
                                         if (!selectedDishes.includes(dish)) {
-                                            setSelectedDishes([ ...selectedDishes, dish ]);
+                                            handleDishSelect(dish);
                                             setNewDish('');
                                         }
                                     }}
                                     className="p-2 cursor-pointer hover:bg-gray-700"
                                 >
-                                    {dish}
+                                    {dish.name}
                                 </li>
                             ))}
                         </ul>
@@ -125,16 +152,25 @@ const WaiterDashboard = () => {
                 <ul className="mb-4">
                     {selectedDishes.map((dish, index) => (
                         <li key={index} className="text-gray-300 flex justify-between items-center">
-                            {dish}
-                            <button
-                                onClick={() => removeDish(dish)}
-                                className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-300"
-                            >
-                                Eliminar
-                            </button>
+                            {dish.name} (x{dish.quantity})
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={() => removeDish(index)}
+                                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-300"
+                                >
+                                    Eliminar
+                                </button>
+                                <button
+                                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded"
+                                    onClick={() => handleDishSelect(dish)}
+                                >
+                                    +1
+                                </button>
+                            </div>
                         </li>
                     ))}
                 </ul>
+                <p className="text-lg font-semibold">Total: ${total.toFixed(2)}</p>
             </div>
         </div>
     );
