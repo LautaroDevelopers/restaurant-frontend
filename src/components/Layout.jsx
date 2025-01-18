@@ -70,8 +70,8 @@ const Layout = ({ children }) => {
                                 )}
                                 {(userRole === 'Administrador' || userRole === 'Mozo') && (
                                     <li>
-                                        <a href="/pedir" className='block px-4 py-2 hover:bg-gray-700 rounded'>
-                                            Pedir
+                                        <a href="/tables" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                                            Mesas
                                         </a>
                                     </li>
                                 )}
