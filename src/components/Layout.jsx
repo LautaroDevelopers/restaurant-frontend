@@ -62,6 +62,11 @@ const Layout = ({ children }) => {
                                             </a>
                                         </li>
                                         <li>
+                                            <a href="/revenue" className="block px-4 py-2 hover:bg-gray-700 rounded">
+                                                Ingresos
+                                            </a>
+                                        </li>
+                                        <li>
                                             <a href="/dishes" className="block px-4 py-2 hover:bg-gray-700 rounded">
                                                 Platos
                                             </a>

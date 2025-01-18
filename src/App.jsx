@@ -13,7 +13,8 @@ import Layout from "./components/Layout";
 import Forbidden from "./components/Forbidden";
 import Orders from "./pages/Orders";
 import ManageDishesPage from "./pages/ManageDishesPage";
-import TablesPage from "./pages/TablesPage"; // Import TablesPage
+import TablesPage from "./pages/TablesPage";
+import RevenuePage from "./pages/RevenuePage";
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/users" element={<ProtectedRoute requiredRole="Administrador"><Layout><UsersPage /></Layout></ProtectedRoute>} />
+                <Route path="/revenue" element={<ProtectedRoute requiredRole={"Administrador"}><Layout><RevenuePage/></Layout></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Layout><DashboardPage /></Layout></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Layout><ProfilePage /></Layout></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><Layout><SettingsPage /></Layout></ProtectedRoute>} />
@@ -30,7 +32,7 @@ function App() {
                 <Route path="/pedir/:tableNumber" element={<ProtectedRoute requiredRole="Mozo"><Layout><WaiterDashboard /></Layout></ProtectedRoute>} />
                 <Route path="/dishes" element={<ProtectedRoute requiredRole="Administrador"><Layout><ManageDishesPage /></Layout></ProtectedRoute>} />
                 <Route path="/tables" element={<ProtectedRoute requiredRole="Mozo"><Layout><TablesPage /></Layout></ProtectedRoute>} />
-                <Route path="/unauthorized" element={<Forbidden messaje="No tienes permiso para acceder a esta página"/>} />
+                <Route path="/unauthorized" element={<Forbidden messaje="No tienes permiso para acceder a esta página" />} />
             </Routes>
         </Router>
     );
