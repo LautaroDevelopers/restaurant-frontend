@@ -51,10 +51,9 @@ const WaiterDashboard = () => {
 
         setLoading(true);
         try {
-            const existingOrder = orders.find(order => order.table_number === parseInt(tableNumber) && order.status !== 'Completado');
+            const existingOrder = orders.find(order => order.table_number === parseInt(tableNumber));
             if (existingOrder) {
                 const updatedDishes = [...existingOrder.dishes];
-                const newDishes = [];
                 selectedDishes.forEach(newDish => {
                     const existingDish = updatedDishes.find(dish => dish.id === newDish.id);
                     if (existingDish) {
@@ -62,7 +61,6 @@ const WaiterDashboard = () => {
                         existingDish.addedQuantity = newDish.quantity;
                     } else {
                         updatedDishes.push({ ...newDish, addedQuantity: newDish.quantity });
-                        newDishes.push(newDish);
                     }
                 });
                 const updatedTotal = updatedDishes.reduce((acc, dish) => acc + dish.quantity * parseFloat(dish.price), 0);
@@ -139,6 +137,20 @@ const WaiterDashboard = () => {
         setTotal(total + parseFloat(dish.price));
     };
 
+    const decrementDishQuantity = (dish) => {
+        const existingDish = selectedDishes.find((d) => d.id === dish.id);
+        if (existingDish && existingDish.quantity > 1) {
+            setSelectedDishes(
+                selectedDishes.map((d) =>
+                    d.id === dish.id ? { ...d, quantity: d.quantity - 1 } : d
+                )
+            );
+            setTotal(total - parseFloat(dish.price));
+        } else {
+            removeDish(selectedDishes.indexOf(dish));
+        }
+    };
+
     const updateDishStatus = async (orderId, dishIndex, status) => {
         const order = orders.find(order => order.id === orderId);
         const updatedDishes = order.dishes.map((dish, index) => index === dishIndex ? { ...dish, status } : dish);
@@ -164,6 +176,10 @@ const WaiterDashboard = () => {
 
     const toggleOrderDetails = (orderId) => {
         setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+    };
+
+    const calculateTotal = (order) => {
+        return order.dishes.reduce((acc, dish) => acc + dish.quantity * parseFloat(dish.price), 0).toFixed(2);
     };
 
     return (
@@ -215,8 +231,8 @@ const WaiterDashboard = () => {
                 <p className='text-xl'>Añadir al pedido</p>
                 <ul className="mb-4">
                     {selectedDishes.map((dish, index) => (
-                        <li key={index} className="text-gray-300 flex justify-between items-center">
-                            {dish.name} (x{dish.quantity})
+                        <li key={index} className="text-gray-300 flex justify-between items-center bg-gray-800 p-2 rounded-lg mb-2">
+                            <span>{dish.name} (x{dish.quantity})</span>
                             <div className="flex space-x-2">
                                 <button
                                     onClick={() => removeDish(index)}
@@ -230,31 +246,27 @@ const WaiterDashboard = () => {
                                 >
                                     +1
                                 </button>
+                                <button
+                                    className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded"
+                                    onClick={() => decrementDishQuantity(dish)}
+                                >
+                                    -1
+                                </button>
                             </div>
                         </li>
                     ))}
                 </ul>
-                <p className="text-lg font-semibold">Total: ${total.toFixed(2)}</p>
             </div>
             <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-4">Órdenes Existentes para Mesa {tableNumber}</h2>
                 {orders.filter(order => order.table_number === parseInt(tableNumber)).map(order => (
-                    <div key={order.id} className="border rounded-lg p-4 mb-4 shadow-lg bg-gray-800">
+                    <div key={order.id} className="rounded-lg px-1 mb-4 shadow-lg">
                         <h3 className="text-lg font-semibold mb-2">Pedido</h3>
                         <ul>
                             {order.dishes.map((dish, index) => (
-                                <li key={index} className="flex justify-between items-center mb-2">
+                                <li key={index} className="flex justify-between items-center mb-2 bg-gray-700 p-2 rounded-lg">
                                     <span>{dish.name} (x{dish.quantity}){dish.addedQuantity ? <span className="text-green-500"> +{dish.addedQuantity}</span> : ''}</span>
-                                    <select
-                                        value={dish.status || 'Pendiente'}
-                                        onChange={(e) => updateDishStatus(order.id, index, e.target.value)}
-                                        className="bg-gray-700 text-white px-2 py-1 rounded"
-                                        disabled={order.status === 'Completado'}
-                                    >
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="En Progreso">En Progreso</option>
-                                        <option value="Completado">Completado</option>
-                                    </select>
+                                    <p className='bg-gray-600 text-white px-4 py-2 rounded'>{order.status}</p>
                                 </li>
                             ))}
                         </ul>
@@ -268,36 +280,15 @@ const WaiterDashboard = () => {
                         )}
                         {expandedOrderId === order.id && (
                             <ul>
-                            {order.dishes.map((dish, index) => (
-                                <li key={index} className="flex justify-between items-center mb-2">
-                                    <span>{dish.name} (x{dish.quantity}){dish.addedQuantity ? <span className="text-green-500"> +{dish.addedQuantity}</span> : ''}</span>
-                                    <select
-                                        value={dish.status || 'Pendiente'}
-                                        onChange={(e) => updateDishStatus(order.id, index, e.target.value)}
-                                        className="bg-gray-700 text-white px-2 py-1 rounded"
-                                        disabled={order.status === 'Completado'}
-                                    >
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="En Progreso">En Progreso</option>
-                                        <option value="Completado">Completado</option>
-                                    </select>
-                                </li>
-                            ))}
-                        </ul>
+                                {order.dishes.map((dish, index) => (
+                                    <li key={index} className="flex justify-between items-center mb-2 bg-gray-700 p-2 rounded-lg">
+                                        <span>{dish.name} (x{dish.quantity}){dish.addedQuantity ? <span className="text-green-500"> +{dish.addedQuantity}</span> : ''}</span>
+                                        <p className='bg-gray-600 text-white px-4 py-2 rounded'>{order.status}</p>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
-                        {order.status !== 'Completado' && (
-                            <div className="mt-4">
-                                <button
-                                    onClick={() => {
-                                        setSelectedDishes(order.dishes.map(dish => ({ ...dish, quantity: 0 })));
-                                        setTotal(0);
-                                    }}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
-                                >
-                                    Añadir más platos
-                                </button>
-                            </div>
-                        )}
+                        <p className="text-lg font-semibold mt-4">Total del Pedido: ${calculateTotal(order)}</p>
                     </div>
                 ))}
             </div>
