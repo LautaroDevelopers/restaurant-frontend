@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,11 +41,20 @@ const TablesPage = () => {
 
     const handleOpenTable = async (id, tableNumber) => {
         try {
+            await axios.put(`http://192.168.0.112:5000/api/tables/${id}/status`, { status: 'Abierta' });
+            fetchTables();
+        } catch (error) {
+            console.error('Error opening table:', error);
+        }
+    };
+
+    const handleOccupyTable = async (id, tableNumber) => {
+        try {
             await axios.put(`http://192.168.0.112:5000/api/tables/${id}/status`, { status: 'Ocupada' });
             fetchTables();
             navigate(`/pedir/${tableNumber}`);
         } catch (error) {
-            console.error('Error opening table:', error);
+            console.error('Error occupying table:', error);
         }
     };
 
@@ -60,6 +69,19 @@ const TablesPage = () => {
 
     const handleOrder = (tableNumber) => {
         navigate(`/pedir/${tableNumber}`);
+    };
+
+    const getTableStyle = (status) => {
+        switch (status) {
+            case 'Abierta':
+                return 'bg-green-800';
+            case 'Ocupada':
+                return 'bg-yellow-800';
+            case 'Cerrada':
+                return 'bg-red-800';
+            default:
+                return 'bg-gray-800';
+        }
     };
 
     return (
@@ -82,16 +104,25 @@ const TablesPage = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tables.map((table) => (
-                    <div key={table.id} className="bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center">
+                    <div key={table.id} className={`${getTableStyle(table.status)} p-4 rounded-lg shadow-md flex flex-col justify-between items-center`}>
                         <span>Mesa: {table.table_number} ({table.status})</span>
+                        <img src="/Mesa.jpg" className="w-full h-32 object-cover rounded-lg mb-2" />
                         <div className="flex space-x-2">
                             {table.status === 'Abierta' && (
-                                <button
-                                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-                                    onClick={() => handleOpenTable(table.id, table.table_number)}
-                                >
-                                    Abrir
-                                </button>
+                                <>
+                                    <button
+                                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                                        onClick={() => handleOccupyTable(table.id, table.table_number)}
+                                    >
+                                        Ocupar
+                                    </button>
+                                    <button
+                                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+                                        onClick={() => handleOpenTable(table.id, table.table_number)}
+                                    >
+                                        Abrir
+                                    </button>
+                                </>
                             )}
                             {table.status === 'Ocupada' && (
                                 <>

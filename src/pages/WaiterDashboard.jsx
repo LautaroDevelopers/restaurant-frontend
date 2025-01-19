@@ -51,18 +51,16 @@ const WaiterDashboard = () => {
 
         setLoading(true);
         try {
-            const existingOrder = orders.find(order => order.table_number === parseInt(tableNumber) && order.status !== 'Completado');
+            const existingOrder = orders.find(order => order.table_number === parseInt(tableNumber));
             if (existingOrder) {
                 const updatedDishes = [...existingOrder.dishes];
-                const newDishes = [];
                 selectedDishes.forEach(newDish => {
                     const existingDish = updatedDishes.find(dish => dish.id === newDish.id);
                     if (existingDish) {
                         existingDish.quantity += newDish.quantity;
-                        existingDish.addedQuantity = newDish.quantity;
+                        existingDish.status = 'Pendiente';
                     } else {
-                        updatedDishes.push({ ...newDish, addedQuantity: newDish.quantity });
-                        newDishes.push(newDish);
+                        updatedDishes.push({ ...newDish, status: 'Pendiente' });
                     }
                 });
                 const updatedTotal = updatedDishes.reduce((acc, dish) => acc + dish.quantity * parseFloat(dish.price), 0);
@@ -82,7 +80,7 @@ const WaiterDashboard = () => {
             }
             setSelectedDishes([]);
             setTotal(0);
-            setSuccess('Pedido creado/actualizado exitosamente');
+            setSuccess('Pedido actualizado exitosamente');
             setError(null);
         } catch (error) {
             console.error('Error al crear/actualizar el pedido:', error);
@@ -126,56 +124,35 @@ const WaiterDashboard = () => {
     };
 
     const handleDishSelect = (dish) => {
-        const existingDish = selectedDishes.find((d) => d.id === dish.id);
+        const existingDish = selectedDishes.find(d => d.id === dish.id);
         if (existingDish) {
             setSelectedDishes(
-                selectedDishes.map((d) =>
+                selectedDishes.map(d =>
                     d.id === dish.id ? { ...d, quantity: d.quantity + 1 } : d
                 )
             );
         } else {
-            setSelectedDishes([...selectedDishes, { ...dish, quantity: 1 }]);
+            setSelectedDishes([...selectedDishes, { ...dish, quantity: 1, status: 'Pendiente' }]);
         }
         setTotal(total + parseFloat(dish.price));
-    };
-
-    const updateDishStatus = async (orderId, dishIndex, status) => {
-        const order = orders.find(order => order.id === orderId);
-        const updatedDishes = order.dishes.map((dish, index) => index === dishIndex ? { ...dish, status } : dish);
-        const generalStatus = getGeneralStatus(updatedDishes);
-        try {
-            await axios.put(`http://192.168.0.112:5000/api/orders/${orderId}`, {
-                status: generalStatus,
-                dishes: updatedDishes,
-                total: order.total
-            });
-            setOrders(orders.map(order => order.id === orderId ? { ...order, status: generalStatus, dishes: updatedDishes } : order));
-        } catch (error) {
-            console.error('Error al actualizar el estado del plato:', error);
-        }
-    };
-
-    const getGeneralStatus = (dishes) => {
-        const statusOrder = ['Pendiente', 'En Progreso', 'Completado'];
-        const dishStatuses = dishes.map(dish => dish.status || 'Pendiente');
-        const minStatus = Math.min(...dishStatuses.map(status => statusOrder.indexOf(status)));
-        return statusOrder[minStatus];
     };
 
     const toggleOrderDetails = (orderId) => {
         setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
     };
 
+    const currentOrder = orders.find(order => order.table_number === parseInt(tableNumber));
+
     return (
         <div className="container mx-auto p-4 max-w-full text-white bg-gray-900">
-            <h1 className="text-3xl font-bold mb-6 text-center">Crear/Actualizar Pedido para Mesa {tableNumber}</h1>
+            <h1 className="text-3xl font-bold mb-6 text-white">Crear/Actualizar Pedido para Mesa {tableNumber}</h1>
 
             {error && <div className="text-red-500 mb-4">{error}</div>}
             {success && <div className="text-green-500 mb-4">{success}</div>}
 
             <div className="mb-6">
                 <div className="mb-4">
-                    <label className="block mb-2">Añadir Plato</label>
+                    <label className="block mb-2 text-white">Añadir Plato</label>
                     <input
                         type="text"
                         placeholder="Escribe para buscar un plato"
@@ -190,10 +167,8 @@ const WaiterDashboard = () => {
                                 <li
                                     key={index}
                                     onClick={() => {
-                                        if (!selectedDishes.some(d => d.id === dish.id)) {
-                                            handleDishSelect(dish);
-                                            setNewDish('');
-                                        }
+                                        handleDishSelect(dish);
+                                        setNewDish('');
                                     }}
                                     className="p-2 cursor-pointer hover:bg-gray-700"
                                 >
@@ -207,15 +182,14 @@ const WaiterDashboard = () => {
                     <button
                         onClick={createOrUpdateOrder}
                         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 w-full"
-                        disabled={loading || newDish !== '' || tableStatus !== 'Ocupada'}
+                        disabled={loading || tableStatus !== 'Ocupada'}
                     >
                         {loading ? 'Creando/Actualizando...' : 'Crear/Actualizar Pedido'}
                     </button>
                 </div>
-                <p className='text-xl'>Añadir al pedido</p>
                 <ul className="mb-4">
                     {selectedDishes.map((dish, index) => (
-                        <li key={index} className="text-gray-300 flex justify-between items-center">
+                        <li key={index} className="flex justify-between items-center mb-2 border rounded p-3 bg-gray-800">
                             {dish.name} (x{dish.quantity})
                             <div className="flex space-x-2">
                                 <button
@@ -224,82 +198,46 @@ const WaiterDashboard = () => {
                                 >
                                     Eliminar
                                 </button>
-                                <button
-                                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded"
-                                    onClick={() => handleDishSelect(dish)}
-                                >
-                                    +1
-                                </button>
                             </div>
                         </li>
                     ))}
                 </ul>
-                <p className="text-lg font-semibold">Total: ${total.toFixed(2)}</p>
             </div>
             <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-4">Órdenes Existentes para Mesa {tableNumber}</h2>
-                {orders.filter(order => order.table_number === parseInt(tableNumber)).map(order => (
-                    <div key={order.id} className="border rounded-lg p-4 mb-4 shadow-lg bg-gray-800">
-                        <h3 className="text-lg font-semibold mb-2">Pedido</h3>
+                <h2 className="text-2xl font-bold mb-4 text-white-400">Pedido Actual para Mesa {tableNumber}</h2>
+                {currentOrder && (
+                    <div key={currentOrder.id} className="rounded-lg px-1 mb-4 shadow-lg bg-gray-800">
                         <ul>
-                            {order.dishes.map((dish, index) => (
-                                <li key={index} className="flex justify-between items-center mb-2">
-                                    <span>{dish.name} (x{dish.quantity}){dish.addedQuantity ? <span className="text-green-500"> +{dish.addedQuantity}</span> : ''}</span>
-                                    <select
-                                        value={dish.status || 'Pendiente'}
-                                        onChange={(e) => updateDishStatus(order.id, index, e.target.value)}
-                                        className="bg-gray-700 text-white px-2 py-1 rounded"
-                                        disabled={order.status === 'Completado'}
-                                    >
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="En Progreso">En Progreso</option>
-                                        <option value="Completado">Completado</option>
-                                    </select>
+                            {currentOrder.dishes.slice(0, 5).map((dish, index) => (
+                                <li key={index} className="flex justify-between items-center mb-2 border rounded p-2 bg-gray-700">
+                                    <span>{dish.name} (x{dish.quantity})</span>
+                                    <p className='bg-gray-600 text-white px-4 py-2 rounded'>{dish.status}</p>
                                 </li>
                             ))}
                         </ul>
-                        {order.dishes.length > 5 && (
+                        {currentOrder.dishes.length > 5 && (
                             <button
-                                onClick={() => toggleOrderDetails(order.id)}
+                                onClick={() => toggleOrderDetails(currentOrder.id)}
                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 mt-2"
                             >
-                                {expandedOrderId === order.id ? 'Ocultar platos' : 'Ver todos los platos'}
+                                {expandedOrderId === currentOrder.id ? 'Ocultar platos' : 'Ver todos los platos'}
                             </button>
                         )}
-                        {expandedOrderId === order.id && (
-                            <ul>
-                            {order.dishes.map((dish, index) => (
-                                <li key={index} className="flex justify-between items-center mb-2">
-                                    <span>{dish.name} (x{dish.quantity}){dish.addedQuantity ? <span className="text-green-500"> +{dish.addedQuantity}</span> : ''}</span>
-                                    <select
-                                        value={dish.status || 'Pendiente'}
-                                        onChange={(e) => updateDishStatus(order.id, index, e.target.value)}
-                                        className="bg-gray-700 text-white px-2 py-1 rounded"
-                                        disabled={order.status === 'Completado'}
-                                    >
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="En Progreso">En Progreso</option>
-                                        <option value="Completado">Completado</option>
-                                    </select>
-                                </li>
-                            ))}
-                        </ul>
-                        )}
-                        {order.status !== 'Completado' && (
-                            <div className="mt-4">
-                                <button
-                                    onClick={() => {
-                                        setSelectedDishes(order.dishes.map(dish => ({ ...dish, quantity: 0 })));
-                                        setTotal(0);
-                                    }}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
-                                >
-                                    Añadir más platos
-                                </button>
-                            </div>
+                        {expandedOrderId === currentOrder.id && (
+                            <ul className="mt-4">
+                                {currentOrder.dishes.slice(5).map((dish, index) => (
+                                    <li key={index + 5} className="flex justify-between items-center mb-2 border rounded p-2 bg-gray-700">
+                                        <span>{dish.name} (x{dish.quantity})</span>
+                                        <p className='bg-gray-600 text-white px-4 py-2 rounded'>{dish.status}</p>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                     </div>
-                ))}
+                )}
+                {currentOrder && (
+                    <p className="text-lg font-semibold text-white">Total: ${currentOrder.total}</p>
+                )}
             </div>
         </div>
     );

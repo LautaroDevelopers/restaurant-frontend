@@ -96,8 +96,7 @@ function RevenuePage() {
 
     return (
         <div className="container mx-auto py-6 text-white">
-            <h2 className="text-3xl font-bold mb-4">Ingresos a lo Largo del Tiempo</h2>
-            <div className="flex mb-4">
+            <div className="flex justify-between items-center mb-4">
                 <div className="mr-4">
                     <label className="block mb-2">Fecha de inicio:</label>
                     <DatePicker
