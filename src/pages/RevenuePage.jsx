@@ -5,6 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Toolt
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ClipLoader } from 'react-spinners';
+import baseURL from '../api';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, PointElement);
 
@@ -21,7 +22,7 @@ function RevenuePage() {
     const fetchRevenueData = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://192.168.0.112:5000/api/revenue');
+            const response = await axios.get(`${baseURL}/api/revenue`);
             const revenue = response.data
                 .filter(data => new Date(data.date) >= startDate && new Date(data.date) <= endDate)
                 .map(data => ({

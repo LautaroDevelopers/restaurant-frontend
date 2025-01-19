@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, ArcElement, PointElement } from 'chart.js';
+import baseURL from '../api';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend, ArcElement, PointElement);
 
@@ -19,9 +20,9 @@ function DashboardPage() {
     const fetchStats = async () => {
         try {
             const [dishesResponse, usersResponse, ordersResponse] = await Promise.all([
-                axios.get('http://192.168.0.112:5000/api/menu'),
-                axios.get('http://192.168.0.112:5000/api/users'),
-                axios.get('http://192.168.0.112:5000/api/orders'),
+                axios.get(`${baseURL}/api/menu`),
+                axios.get(`${baseURL}/api/users`),
+                axios.get(`${baseURL}/api/orders`),
             ]);
 
             setStats({
@@ -36,7 +37,7 @@ function DashboardPage() {
 
     const fetchRevenueData = async () => {
         try {
-            const response = await axios.get('http://192.168.0.112:5000/api/revenue');
+            const response = await axios.get(`${baseURL}/api/revenue`);
             const revenue = response.data.map(data => ({
                 date: new Date(data.date).toLocaleDateString('en-GB'),
                 total: data.total,
@@ -49,7 +50,7 @@ function DashboardPage() {
 
     const fetchUsersData = async () => {
         try {
-            const response = await axios.get('http://192.168.0.112:5000/api/users');
+            const response = await axios.get(`${baseURL}/api/users`);
             setUsersData(response.data);
         } catch (error) {
             console.error('Error al obtener datos de usuarios:', error);

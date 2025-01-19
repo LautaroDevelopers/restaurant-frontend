@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import baseURL from '../api';
 
 const ProfilePage = () => {
     const [ profile, setProfile ] = useState(null);
@@ -17,7 +18,7 @@ const ProfilePage = () => {
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://192.168.0.112:5000/api/users/profile', {
+                const response = await axios.get(`${baseURL}/api/users/profile`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -46,7 +47,7 @@ const ProfilePage = () => {
     const handleSaveChanges = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://192.168.0.112:5000/api/users/${profile.id}`, formData, {
+            await axios.put(`${baseURL}/api/users/${profile.id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -169,7 +170,7 @@ const ChangePasswordForm = ({ userId }) => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://192.168.0.112:5000/api/users/${userId}/password`, {
+            await axios.put(`${baseURL}/api/users/${userId}/password`, {
                 currentPassword,
                 newPassword
             }, {

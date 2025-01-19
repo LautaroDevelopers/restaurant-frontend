@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import baseURL from '../api';
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
@@ -10,7 +11,7 @@ export default function Orders() {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get('http://192.168.0.112:5000/api/orders');
+                const response = await axios.get(`${baseURL}/api/orders`);
                 setOrders(response.data);
             } catch (error) {
                 console.error('Error al obtener los pedidos:', error);
@@ -22,7 +23,7 @@ export default function Orders() {
     const updateOrderStatus = async (orderId, status) => {
         try {
             const order = orders.find(order => order.id === orderId);
-            await axios.put(`http://192.168.0.112:5000/api/orders/${orderId}`, {
+            await axios.put(`${baseURL}/api/orders/${orderId}`, {
                 status,
                 dishes: order.dishes,
                 total: order.total
@@ -42,7 +43,7 @@ export default function Orders() {
         const updatedDishes = order.dishes.map((dish, index) => index === dishIndex ? { ...dish, status } : dish);
         const generalStatus = getGeneralStatus(updatedDishes);
         try {
-            await axios.put(`http://192.168.0.112:5000/api/orders/${orderId}`, {
+            await axios.put(`${baseURL}/api/orders/${orderId}`, {
                 status: generalStatus,
                 dishes: updatedDishes,
                 total: order.total

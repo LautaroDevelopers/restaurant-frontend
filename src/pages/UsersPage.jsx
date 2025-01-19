@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RiMore2Fill } from '@remixicon/react';
+import baseURL from '../api';
 
 function UsersPage() {
     const [username, setUsername] = useState('');
@@ -22,7 +23,7 @@ function UsersPage() {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('http://192.168.0.112:5000/api/users');
+            const response = await axios.get(`${baseURL}/api/users`);
             setUsers(response.data);
         } catch (error) {
             console.error('Error fetching users:', error);
@@ -32,7 +33,7 @@ function UsersPage() {
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://192.168.0.112:5000/api/users/register', { username, password, first_name, last_name, email, role });
+            await axios.post(`${baseURL}/api/users/register`, { username, password, first_name, last_name, email, role });
             fetchUsers();
             setShowModal(false);
         } catch (error) {
@@ -47,7 +48,7 @@ function UsersPage() {
 
     const handleUpdateUser = async (userId, updatedUser) => {
         try {
-            await axios.put(`http://192.168.0.112:5000/api/users/${userId}`, updatedUser);
+            await axios.put(`${baseURL}/api/users/${userId}`, updatedUser);
             fetchUsers();
             setEditingUser(null);
         } catch (error) {
@@ -61,7 +62,7 @@ function UsersPage() {
 
     const handleDeleteUser = async (userId) => {
         try {
-            await axios.delete(`http://192.168.0.112:5000/api/users/${userId}`);
+            await axios.delete(`${baseURL}/api/users/${userId}`);
             fetchUsers();
         } catch (error) {
             console.error('Error deleting user:', error);

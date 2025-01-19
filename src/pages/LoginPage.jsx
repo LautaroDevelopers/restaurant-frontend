@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { RiArrowLeftLine } from '@remixicon/react';
+import baseURL from '../api';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
@@ -11,7 +12,7 @@ function LoginPage() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://192.168.0.112:5000/api/users/login', { username, password });
+            const response = await axios.post(`${baseURL}/api/users/login`, { username, password });
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('role', response.data.role);
             navigate('/dashboard');

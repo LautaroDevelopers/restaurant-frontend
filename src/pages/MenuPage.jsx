@@ -4,6 +4,7 @@ import NavBar from "../components/NavBar";
 import { RiSearchLine } from '@remixicon/react';
 import Footer from "../components/Footer";
 import PropTypes from 'prop-types';
+import baseURL from '../api';
 
 Cards.propTypes = {
     searchTerm: PropTypes.string.isRequired,
@@ -53,7 +54,7 @@ function Cards({ searchTerm, menu, onProductClick }) {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {filteredMenu.map((dish) => (
                     <div key={dish.name} className="bg-white p-4 rounded-lg shadow-lg cursor-pointer" onClick={() => onProductClick(dish)}>
-                        <img src={`http://192.168.0.112:5000${dish.image_url}`} className="w-full h-auto rounded-lg" alt={dish.name} />
+                        <img src={`${baseURL}${dish.image_url}`} className="w-full h-auto rounded-lg" alt={dish.name} />
                         <h4 className="text-xl font-bold text-gray-800 my-2">{dish.name}</h4>
                         <p className="text-gray-600 my-2">
                             {dish.description.length > 100 ? `${dish.description.substring(0, 100)}...` : dish.description}
@@ -75,7 +76,7 @@ export default function MenuPage() {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        axios.get('http://192.168.0.112:5000/api/menu')
+        axios.get(`${baseURL}/api/menu`)
             .then(response => {
                 setMenu(response.data);
             })
@@ -119,7 +120,7 @@ export default function MenuPage() {
                                 </svg>
                             </button>
                         </div>
-                        <img src={`http://192.168.0.112:5000${selectedProduct.image_url}`} className="w-full h-48 object-cover rounded-lg mb-4" alt={selectedProduct.name} />
+                        <img src={`${baseURL}${selectedProduct.image_url}`} className="w-full h-48 object-cover rounded-lg mb-4" alt={selectedProduct.name} />
                         <p className="text-lg text-gray-700 mb-4">{selectedProduct.description}</p>
                         <p className="text-lg text-gray-700 mb-4">Precio: ${selectedProduct.price} ARS</p>
                         <button

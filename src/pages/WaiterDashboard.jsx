@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import baseURL from '../api';
 
 const WaiterDashboard = () => {
     const { tableNumber } = useParams();
@@ -18,7 +19,7 @@ const WaiterDashboard = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get('http://192.168.0.112:5000/api/orders');
+                const response = await axios.get(`${baseURL}/api/orders`);
                 setOrders(response.data);
             } catch (error) {
                 console.error('Error al obtener los pedidos:', error);
@@ -30,7 +31,7 @@ const WaiterDashboard = () => {
     useEffect(() => {
         const fetchTableStatus = async () => {
             try {
-                const response = await axios.get(`http://192.168.0.112:5000/api/tables/${tableNumber}`);
+                const response = await axios.get(`${baseURL}/api/tables/${tableNumber}`);
                 setTableStatus(response.data.status);
                 if (response.data.status === 'Abierta') {
                     setSelectedDishes([]);
@@ -64,14 +65,14 @@ const WaiterDashboard = () => {
                     }
                 });
                 const updatedTotal = updatedDishes.reduce((acc, dish) => acc + dish.quantity * parseFloat(dish.price), 0);
-                await axios.put(`http://192.168.0.112:5000/api/orders/${existingOrder.id}`, {
+                await axios.put(`${baseURL}/api/orders/${existingOrder.id}`, {
                     status: 'Pendiente',
                     dishes: updatedDishes,
                     total: updatedTotal.toFixed(2)
                 });
                 setOrders(orders.map(order => order.id === existingOrder.id ? { ...order, status: 'Pendiente', dishes: updatedDishes, total: updatedTotal.toFixed(2) } : order));
             } else {
-                const response = await axios.post('http://192.168.0.112:5000/api/orders', {
+                const response = await axios.post(`${baseURL}/api/orders`, {
                     table_number: tableNumber,
                     dishes: selectedDishes,
                     total: total.toFixed(2)
@@ -94,7 +95,7 @@ const WaiterDashboard = () => {
     useEffect(() => {
         const fetchMenu = async () => {
             try {
-                const response = await axios.get('http://192.168.0.112:5000/api/menu');
+                const response = await axios.get(`${baseURL}/api/menu`);
                 setMenuDishes(response.data);
             } catch (error) {
                 console.error('Error al obtener la carta:', error);

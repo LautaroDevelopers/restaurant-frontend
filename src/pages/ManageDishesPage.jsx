@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RiMore2Fill } from '@remixicon/react';
+import baseURL from '../api';
 
 const ManageDishesPage = () => {
     const [dishes, setDishes] = useState([]);
@@ -16,7 +17,7 @@ const ManageDishesPage = () => {
 
     const fetchDishes = async () => {
         try {
-            const response = await axios.get('http://192.168.0.112:5000/api/menu');
+            const response = await axios.get(`${baseURL}/api/menu`);
             setDishes(response.data);
         } catch (error) {
             console.error('Error fetching dishes:', error);
@@ -45,7 +46,7 @@ const ManageDishesPage = () => {
         }
 
         try {
-            await axios.post('http://192.168.0.112:5000/api/menu', formData, {
+            await axios.post(`${baseURL}/api/menu`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -74,7 +75,7 @@ const ManageDishesPage = () => {
         }
 
         try {
-            await axios.put(`http://192.168.0.112:5000/api/menu/${editingDish.id}`, formData, {
+            await axios.put(`${baseURL}/api/menu/${editingDish.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -89,7 +90,7 @@ const ManageDishesPage = () => {
 
     const handleDeleteDish = async (id) => {
         try {
-            await axios.delete(`http://192.168.0.112:5000/api/menu/${id}`);
+            await axios.delete(`${baseURL}/api/menu/${id}`);
             fetchDishes();
         } catch (error) {
             console.error('Error deleting dish:', error);
@@ -126,7 +127,7 @@ const ManageDishesPage = () => {
                                 <div className="flex items-center space-x-4">
                                     {dish.image_url && (
                                         <img
-                                            src={`http://192.168.0.112:5000${dish.image_url}`}
+                                            src={`${baseURL}${dish.image_url}`}
                                             alt={dish.name}
                                             className="w-16 h-16 object-cover rounded-full"
                                         />
@@ -181,7 +182,7 @@ const ManageDishesPage = () => {
                                     <td className="px-4 py-2 border-b border-gray-700 text-center">
                                         {dish.image_url && (
                                             <img
-                                                src={`http://192.168.0.112:5000${dish.image_url}`}
+                                                src={`${baseURL}${dish.image_url}`}
                                                 alt={dish.name}
                                                 className="w-16 h-16 object-cover mx-auto"
                                             />
